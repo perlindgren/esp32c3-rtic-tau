@@ -1,0 +1,13 @@
+{
+    "cSpell.ignoreWords": [
+        "GPIO",
+        "TIMG",
+        "baudrate",
+        "minicom",
+        "moserial",
+        "rprint",
+        "rprintln",
+        "rtic",
+        "uart"
+    ]
+}
