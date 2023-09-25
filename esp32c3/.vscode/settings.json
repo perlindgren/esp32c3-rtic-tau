@@ -3,6 +3,7 @@
         "GPIO",
         "TIMG",
         "baudrate",
+        "lowprio",
         "minicom",
         "moserial",
         "rprint",

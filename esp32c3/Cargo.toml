@@ -7,20 +7,30 @@ edition = "2021"
 
 [dependencies]
 
-critical-section = "1.1.1"
+critical-section = "1.1.2"
 cfg-if = "1.0.0"
+
+# target dependency
 esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", features = [
     "direct-boot",
     "interrupt-preemption",
     "direct-vectoring",
 ] }
+esp32c3 = { version = "0.17.0", features = ["critical-section"] }
+
+# tracing and panic handling
 rtt-target = { version = "0.4.0" }
+panic-rtt-target = "0.1.2"
+
+# rtic framework
 rtic = { git = 'https://github.com/onsdagens/rtic', features = [
     "riscv-esp32c3-backend",
 ] }
-esp32c3 = { version = "0.17.0", features = ["critical-section"] }
+rtic-sync = "1.0.2"
+# portable-atomic = { version = "1", default-features = false }
+
+# application dependency
 shared = { path = "../shared" }
-panic-rtt-target = "0.1.2"
 
 [profile.release]
 incremental = false
