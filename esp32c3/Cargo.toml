@@ -11,7 +11,7 @@ critical-section = "1.1.2"
 cfg-if = "1.0.0"
 
 # target dependency
-esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", features = [
+esp32c3-hal = { git = "https://github.com/perlindgren/esp-hal", branch = 'uart', features = [
     "direct-boot",
     "interrupt-preemption",
     "direct-vectoring",
@@ -42,3 +42,4 @@ opt-level = 3
 [patch.crates-io]
 rtt-target = { git = 'https://github.com/perlindgren/rtt-target', branch = 'cell' }
 panic-rtt-target = { git = 'https://github.com/perlindgren/rtt-target', branch = 'cell' }
+# esp32c3-hal = { git = 'https://github.com/perlindgren/esp-hal', branch = 'uart' }

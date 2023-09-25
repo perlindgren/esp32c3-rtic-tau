@@ -20,7 +20,6 @@ use panic_rtt_target as _;
 
 #[rtic::app(device = esp32c3, dispatchers = [FROM_CPU_INTR0, FROM_CPU_INTR1])]
 mod app {
-    use core::fmt::Write;
     use esp32c3_hal::{
         clock::ClockControl,
         peripherals::{Peripherals, TIMG0, UART0},
@@ -28,30 +27,31 @@ mod app {
         timer::{Timer, Timer0, TimerGroup},
         uart::{
             config::{Config, DataBits, Parity, StopBits},
-            TxRxPins,
+            TxRxPins, UartRx, UartTx,
         },
         Uart, IO,
     };
-    use nb::block;
+
     use rtic_sync::{channel::*, make_channel};
     use rtt_target::{rprint, rprintln, rtt_init_print};
 
+    const CAPACITY: usize = 100;
+
     #[shared]
-    struct Shared {
-        uart0: Uart<'static, UART0>,
-    }
+    struct Shared {}
 
     #[local]
     struct Local {
         timer0: Timer<Timer0<TIMG0>>,
+        tx: UartTx<'static, UART0>,
+        rx: UartRx<'static, UART0>,
+        sender: Sender<'static, u8, CAPACITY>,
     }
-
-    const CAPACITY: usize = 1;
     #[init]
     fn init(_: init::Context) -> (Shared, Local) {
         rtt_init_print!();
-        rprintln!("uart_echo");
-        let (s, r) = make_channel!(u32, CAPACITY);
+        rprintln!("cmd_crc_cobs_lib");
+        let (sender, receiver) = make_channel!(u8, CAPACITY);
 
         let peripherals = Peripherals::take();
         let mut system = peripherals.SYSTEM.split();
@@ -92,59 +92,60 @@ mod app {
 
         timer0.start(1u64.secs());
 
-        lowprio::spawn(r).unwrap();
-        sender::spawn(s).unwrap();
+        let (tx, rx) = uart0.split();
 
-        (Shared { uart0 }, Local { timer0 })
+        lowprio::spawn(receiver).unwrap();
+
+        (
+            Shared {},
+            Local {
+                timer0,
+                tx,
+                rx,
+                sender,
+            },
+        )
     }
 
-    #[idle(local = [timer0], shared = [uart0])]
-    fn idle(mut cx: idle::Context) -> ! {
+    // notice this is not an async task
+    #[idle(local = [ timer0 ])]
+    fn idle(cx: idle::Context) -> ! {
         loop {
-            cx.shared.uart0.lock(|uart0| {
-                writeln!(uart0, "Hello to Finland from Esp32C3!").unwrap();
-            });
-            block!(cx.local.timer0.wait()).unwrap();
+            rprintln!("idle, do some background work if any ...");
+            // not async wait
+            nb::block!(cx.local.timer0.wait()).unwrap();
         }
     }
 
-    #[task(binds = UART0, priority=2, shared=[uart0])]
-    fn uart0(mut cx: uart0::Context) {
-        rprint!("Interrupt Received: ");
-        cx.shared.uart0.lock(|uart0| {
-            while let nb::Result::Ok(c) = uart0.read() {
-                writeln!(uart0, "Read byte: {:02x}", c).unwrap();
-                rprint!("{}", c as char);
+    #[task(binds = UART0, priority=2, local = [ rx, sender])]
+    fn uart0(cx: uart0::Context) {
+        let rx = cx.local.rx;
+        let sender = cx.local.sender;
+
+        rprintln!("Interrupt Received: ");
+
+        while let nb::Result::Ok(c) = rx.read() {
+            // writeln!(uart0, "Read byte: {:02x}", c).unwrap();
+            rprint!("{}", c as char);
+            match sender.try_send(c) {
+                Err(_) => {
+                    rprintln!("send buffer full");
+                }
+                _ => {}
             }
-            uart0.reset_rx_fifo_full_interrupt()
-        });
-    }
-
-    #[task(priority = 1)]
-    async fn sender(mut cx: sender::Context, mut sender: Sender<'static, u32, CAPACITY>) {
-        rprintln!("sender started");
-        let f = sender.send(32);
-        rprintln!("sender_sent");
-        let r = f.await;
-
-        rprintln!("sender r {:?}", r);
-    }
-
-    #[task(priority = 2, shared=[uart0])]
-    async fn lowprio(mut cx: lowprio::Context, mut receiver: Receiver<'static, u32, CAPACITY>) {
-        rprintln!("LowPrio started");
-
-        while let Ok(val) = receiver.recv().await {
-            rprintln!("Receiver got: {}", val);
         }
+        rx.reset_rx_fifo_full_interrupt()
+    }
 
-        // cx.shared.uart0.lock(|uart0| {
-        //     while let nb::Result::Ok(c) = uart0.read() {
-        //         writeln!(uart0, "Read byte: {:02x}", c).unwrap();
-        //         rprint!("{}", c as char);
-        //     }
-        //     uart0.reset_rx_fifo_full_interrupt()
-        // });
+    #[task(priority = 1, local = [ tx ])]
+    async fn lowprio(cx: lowprio::Context, mut receiver: Receiver<'static, u8, CAPACITY>) {
+        rprintln!("LowPrio started");
+        let tx = cx.local.tx;
+
+        while let Ok(c) = receiver.recv().await {
+            rprintln!("Receiver got: {}", c);
+            tx.write(c).unwrap();
+        }
     }
 }
 
