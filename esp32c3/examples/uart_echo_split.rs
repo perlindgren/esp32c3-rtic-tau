@@ -134,7 +134,6 @@ mod app {
         rprintln!("Interrupt Received: ");
 
         while let nb::Result::Ok(c) = rx.read() {
-            // writeln!(uart0, "Read byte: {:02x}", c).unwrap();
             rprint!("{}", c as char);
             match sender.try_send(c) {
                 Err(_) => {
