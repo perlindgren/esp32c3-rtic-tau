@@ -1,11 +1,12 @@
 //! host side application
 //!
-//! On target `cd servant` run:
+//! Run on target `cd esp32c3`
 //!
 //! cargo embed --example cmd_crc_cobs_lib --release
 //!
-//! On host `cd master` run:
-//! cargo run --example cmd_crc_cobs_lib
+//! Run on host `cd host`
+//!
+//! cargo run
 //!
 
 // Rust dependencies

@@ -9,6 +9,7 @@
         "rprint",
         "rprintln",
         "rtic",
+        "ssmarshal",
         "uart"
     ]
 }

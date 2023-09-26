@@ -59,7 +59,7 @@ mod app {
     #[init]
     fn init(_: init::Context) -> (Shared, Local) {
         rtt_init_print!();
-        rprintln!("cmd_crc_cobs_lib");
+        rprintln!("uart_echo_split");
         let (sender, receiver) = make_channel!(u8, CAPACITY);
 
         let peripherals = Peripherals::take();

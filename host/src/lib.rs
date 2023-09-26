@@ -15,7 +15,7 @@ static COM_PATH: &str = "COM3";
 const TIME_OUT: Duration = Duration::from_millis(1000);
 
 pub fn open() -> Result<SerialPort> {
-    let mut port = SerialPort::open(COM_PATH, 9600)?;
+    let mut port = SerialPort::open(COM_PATH, 115200)?;
     // Needed for windows, but should not hurt on Linux
     port.set_dtr(true)?;
     port.set_rts(true)?;
