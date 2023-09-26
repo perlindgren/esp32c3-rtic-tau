@@ -12,7 +12,7 @@
 //!
 //! moserial -p moserial_acm1.cfg
 //!
-//! Echoes incoming data + 1 (a->b, etc.)
+//! Echoes incoming data
 //!
 //! This assumes we have usb<->serial adepter appearing as /dev/ACM1
 //! - Target TX = GPIO0, connect to RX on adapter
@@ -115,8 +115,8 @@ mod app {
         rprint!("Interrupt Received: ");
         cx.shared.uart0.lock(|uart0| {
             while let nb::Result::Ok(c) = uart0.read() {
-                writeln!(uart0, "Read byte: {:02x}", c).unwrap();
-                rprint!("{}", c as char);
+                uart0.write(c).unwrap();
+                rprintln!("{}", c as char);
             }
             uart0.reset_rx_fifo_full_interrupt()
         });

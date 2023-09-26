@@ -12,7 +12,7 @@
 //!
 //! moserial -p moserial_acm1.cfg
 //!
-//! Echoes incoming data + 1 (a->b, etc.)
+//! Echoes incoming data
 //!
 //! This assumes we have usb<->serial adepter appearing as /dev/ACM1
 //! - Target TX = GPIO0, connect to RX on adapter
@@ -142,6 +142,7 @@ mod app {
                 _ => {}
             }
         }
+        rprintln!("");
         rx.reset_rx_fifo_full_interrupt()
     }
 
