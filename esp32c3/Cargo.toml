@@ -26,13 +26,12 @@ panic-rtt-target = "0.1.2"
 rtic = { git = 'https://github.com/onsdagens/rtic', features = [
     "riscv-esp32c3-backend",
 ] }
-rtic-sync = "1.0.2"
-# portable-atomic = { version = "1", default-features = false }
+
+rtic-sync = { git = 'https://github.com/onsdagens/rtic', branch = 'portable_atomic' }
 
 # external libraries used
 ssmarshal = { version = "1.0.0", default-features = false }
 corncobs = "0.1.3"
-# nb = "1.1.0"
 crc = "3.0.1"
 
 # application dependency
@@ -49,3 +48,5 @@ opt-level = 3
 rtt-target = { git = 'https://github.com/perlindgren/rtt-target', branch = 'cell' }
 panic-rtt-target = { git = 'https://github.com/perlindgren/rtt-target', branch = 'cell' }
 # esp32c3-hal = { git = 'https://github.com/perlindgren/esp-hal', branch = 'uart' }
+# rtic-sync = { path = "../../pawel/rtic/rtic-sync" }
+# rtic-common = { path = "../../pawel/rtic/rtic-common" }
