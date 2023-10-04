@@ -23,11 +23,11 @@ rtt-target = { version = "0.4.0" }
 panic-rtt-target = "0.1.2"
 
 # rtic framework
-rtic = { git = 'https://github.com/onsdagens/rtic', features = [
+rtic = { git = 'https://github.com/rtic-rs/rtic', features = [
     "riscv-esp32c3-backend",
 ] }
 
-rtic-sync = { git = 'https://github.com/onsdagens/rtic', branch = 'portable_atomic' }
+rtic-sync = { git = 'https://github.com/rtic-rs/rtic' }
 
 # external libraries used
 ssmarshal = { version = "1.0.0", default-features = false }
@@ -47,6 +47,3 @@ opt-level = 3
 [patch.crates-io]
 rtt-target = { git = 'https://github.com/perlindgren/rtt-target', branch = 'cell' }
 panic-rtt-target = { git = 'https://github.com/perlindgren/rtt-target', branch = 'cell' }
-# esp32c3-hal = { git = 'https://github.com/perlindgren/esp-hal', branch = 'uart' }
-# rtic-sync = { path = "../../pawel/rtic/rtic-sync" }
-# rtic-common = { path = "../../pawel/rtic/rtic-common" }

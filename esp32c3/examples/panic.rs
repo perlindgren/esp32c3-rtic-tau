@@ -29,7 +29,7 @@ mod app {
     #[init]
     fn init(_: init::Context) -> (Shared, Local) {
         rtt_init_print!();
-        rprintln!("panic");
+        rprintln!("no panic so far");
 
         panic!("explicit panic");
 

@@ -13,8 +13,6 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-use panic_rtt_target as _;
-
 // bring in panic handler
 use panic_rtt_target as _;
 
